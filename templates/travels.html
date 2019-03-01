@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Travel Dashboard </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 80%;
+    margin-left: 20px;
+    }
+    
+    td, th {
+    border: 1px solid #dddddd;
+    /* text-align: left; */
+    padding: 10px;
+    width:auto;
+    }
+    
+    tr:nth-child(even) {
+    background-color: #dddddd;
+    }
+    .links{
+        margin-left: 20px;
+    }
+    </style>
+</head>
+<body> 
+    <h1>Hello, {{userdata.full_name}}!</h1>
+    <h3>Your Trip Schedules</h3>
+    <table>
+        <tr>
+            <th>Destination</th>
+            <th>Travel Start Date</th>
+            <th>Travel End Date</th>
+            <th>Plan</th>
+        </tr>
+        <tr>
+            <td>{{userdata.destination}}</td>
+            <td>{{userdata.start_date}} </td>
+            <td> {{userdata.end_date}}</td>
+            <td> {{userdata.plan}}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    
+    </table>
+    
+    {% with messages = get_flashed_messages() %}     
+            {% if messages %}                           
+                {% for message in messages %}            
+                    <p class="text-danger">{{message}}</p>                   
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    <div class = links>
+        <form action="/logout" method="POST">
+            <input type="submit"class="btn btn-success" value="Logout">
+            <a href="/main/travels/add">Add Travel Plan</a>
+
+
+        </form>
+    </div>
+        
+</body>
+</html>
