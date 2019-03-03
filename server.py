@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 from mysqlconn import connectToMySQL
-from flask_bcrypt import Bcrypt 
+from flask_bcrypt import Bcrypt
 import re
+from datetime import datetime
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$') 
 app = Flask(__name__)
 app.secret_key = 'keep it secret, keep it safe'
 bcrypt = Bcrypt(app)
+now = str(datetime.now())
 
 @app.route("/main")
 def index():
@@ -50,6 +52,8 @@ def create():
         db = connectToMySQL('vacays')
         flash("Successfully added")
         userdata = db.query_db(query,data)
+        print(userdata)
+        print("*"*100)
         session['userdata'] = userdata
     
         return redirect("/travels")
@@ -57,7 +61,28 @@ def create():
         return redirect("/main")
 
 
-# put log in info
+@app.route("/login", methods=["POST"])
+def login():
+    db = connectToMySQL("vacays")
+    query = "SELECT * from users WHERE username = %(un)s;"
+    data = {
+        "un": request.form["username"]
+    }
+    result = db.query_db(query,data)
+
+    print(result)
+
+    if len(result) == 0:
+        flash("username not found, please register!")
+        return redirect("/main")
+
+    else:
+        if bcrypt.check_password_hash(result[0]['password'], request.form['password']) == True:
+            session['userdata'] = result[0]['id']
+            return redirect("/travels")
+        else:
+            flash("Password does not match!")
+            return redirect("/main")
             
 @app.route("/travels")
 def travels():
@@ -67,12 +92,24 @@ def travels():
 
 
     query = "SELECT * FROM users WHERE id=%(id)s;"
+
     data = {
         "id": session['userdata']
 
     }
     db = connectToMySQL('vacays')
     users = db.query_db(query, data)
+    query = "SELECT * FROM travel_plan WHERE ud=%(ud)s;"
+    print("*"*100)
+    print(session['userdata'])
+
+    # testingData = testdata
+    # if testdata:
+    #     print ("&" *100)
+    #     print(testdata)
+    #     print ("&" *100)
+    # else:
+    #     print("no test data yet"*5)
     return render_template("travels.html", userdata=users[0])
 
             
@@ -82,6 +119,85 @@ def add_trip():
 
 @app.route("/add", methods = ["POST"])
 def add():
+    is_valid = True		
+    if len(request.form['destination']) < 1:
+        is_valid = False 
+        flash("Please enter a Destination")
+    
+    if len(request.form['plan']) < 1:
+        is_valid = False
+        flash("Please enter a Description")
+    
+    if request.form['end_date'] < request.form['start_date']:
+        is_valid = False
+        flash("End date cannot come before start date!")
+
+
+    if len(request.form['start_date']) < 1:
+        is_valid = False
+        flash("Please enter a travel date from")
+    
+    elif request.form['start_date'] < now:
+        is_valid = False
+        flash("Choose a different start date")
+    
+    if len(request.form['end_date']) < 1:
+        is_valid = False
+        flash("Please enter a Travel date to")
+    
+    elif request.form['end_date'] < now:
+        is_valid = False
+        flash("Choose a different end date")
+    
+    if is_valid == True:
+        query = "INSERT INTO travel_plan (destination, start_date, end_date, plan, users_id, created_at, updated_on) VALUES (%(d)s, %(sd)s, %(ed)s, %(p)s, %(ud)s, NOW(), NOW());"
+        data = {
+            "d": request.form["destination"],
+            "sd": request.form["start_date"],
+            "ed" : request.form["end_date"],
+            "p": request.form["plan"],
+            "ud": session['userdata']
+        }
+        db = connectToMySQL('vacays')
+        flash("Successfully added")
+        tripdata = db.query_db(query,data)
+        # print(tripdata)
+        # print("*"*20)
+        query = "INSERT INTO users_travelplan (users_id, travel_plan_id, created_at, updated_at) VALUES (%(ui)s, %(ti)s, NOW(), NOW());"
+        data ={
+            "ui": session["userdata"],
+            "ti": tripdata
+        }
+        db = connectToMySQL('vacays')
+        db.query_db(query,data)
+        # print("%"*100)
+        # print(db)
+
+        # db = connectToMySQL('vacays')
+        # query = "SELECT * FROM travel_plan WHERE id=%(id_num)s;"
+        # data = {
+        #     "ui": session["userdata"],
+        #     "id_ num": 
+        # }
+        # tripdata = db.query_db(query, data)
+        # print("*"*100)
+        # print(tripdata)
+        # print("*"*100)
+        db = connectToMySQL('vacays')
+        query = "SELECT * FROM travel_plan WHERE id=50;"
+        testdata = db.query_db(query)
+        print("*"*100)
+        print(testdata)
+        print("*"*100)
+
+
+        return redirect(url_for('travels', testdata = testdata))
+        # return redirect("/travels", testdata = testdata)
+
+    else:
+        return redirect("/main/travels/add")
+
+
     #print request.form before second query see if it is going to add then print out form info and then do validations, if pass validations then create trip or redirect to redirect to form. 
 
     # query = "INSERT INTO travel_plan (destination, start_date, end_date, plan, created_at, updated_at) VALUES (%(d)s, %(sd)s, %(ed)s, %(plan)s, NOW(), NOW());"
@@ -94,7 +210,7 @@ def add():
     # db = connectToMySQL('vacays')
     # userdata = db.query_db(query,data)
     # print(userdata)
-    return redirect("/travels")
+    # return redirect("/travels")
         
 
 
