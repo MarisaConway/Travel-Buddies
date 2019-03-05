@@ -11,11 +11,8 @@ now = str(datetime.now())
 
 @app.route("/main")
 def index():
-    db= connectToMySQL('vacays')
-    users = db.query_db('SELECT * FROM users;')
-    userdata = users[0]
-    print(users)
-    return render_template("index.html", all_users = users, userdata = userdata)
+    
+    return render_template("index.html")
 
 
     
@@ -89,8 +86,6 @@ def travels():
     # if 'userid' not in session:
     #     flash("you must log in")
     #     return redirect("/main")
-
-
     query = "SELECT * FROM users WHERE id=%(id)s;"
 
     data = {
@@ -99,18 +94,14 @@ def travels():
     }
     db = connectToMySQL('vacays')
     users = db.query_db(query, data)
-    query = "SELECT * FROM travel_plan WHERE ud=%(ud)s;"
-    print("*"*100)
-    print(session['userdata'])
+    
+    db = connectToMySQL('vacays')
+    query = "SELECT * FROM users_travelplan RIGHT JOIN travel_plan ON travel_plan_id = %(id)s;"
+   
+    trips = db.query_db(query,data)
+    print(trips)
 
-    # testingData = testdata
-    # if testdata:
-    #     print ("&" *100)
-    #     print(testdata)
-    #     print ("&" *100)
-    # else:
-    #     print("no test data yet"*5)
-    return render_template("travels.html", userdata=users[0])
+    return render_template("travels.html", userdata=users[0], trips=trips)
 
             
 @app.route("/main/travels/add")
@@ -183,19 +174,40 @@ def add():
         # print("*"*100)
         # print(tripdata)
         # print("*"*100)
-        db = connectToMySQL('vacays')
-        query = "SELECT * FROM travel_plan WHERE id=50;"
-        testdata = db.query_db(query)
-        print("*"*100)
-        print(testdata)
-        print("*"*100)
+        
+        
+        
+        
+        
+        
+        # db = connectToMySQL('vacays')
+        # query = "SELECT * FROM travel_plan WHERE id=50;"
+        # global testdata
+        # testdata = db.query_db(query)
+        # print("*"*100)
+        # print(testdata)
+        # print("*"*100)
 
 
-        return redirect(url_for('travels', testdata = testdata))
+        return redirect(url_for('travels'))
         # return redirect("/travels", testdata = testdata)
 
     else:
         return redirect("/main/travels/add")
+
+
+@app.route("/main/travels/destination/<id>")
+def destination (id):
+    db = connectToMySQL("vacays")
+    query = "SELECT * FROM travel_plan where id = %(id)s;"
+    data = {
+        "id": session['userdata']
+
+    }
+    trip = db.query_db(query,data)
+    print(trip)
+    return render_template("destination.html", trip=trip[0])
+
 
 
     #print request.form before second query see if it is going to add then print out form info and then do validations, if pass validations then create trip or redirect to redirect to form. 

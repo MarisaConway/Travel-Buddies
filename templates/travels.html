@@ -44,25 +44,20 @@
             <th>Travel End Date</th>
             <th>Plan</th>
         </tr>
+        {% for trip in trips %}
         <tr>
-            <td>{{testdata}}</td>
-            <td>{{userdata.start_date}} </td>
-            <td> {{userdata.end_date}}</td>
-            <td> {{userdata.plan}}</td>
+            <td><a href="/main/travels/destination/{{trip['travel_plan.id']}}">{{trip.destination}}</a></td>
+            <td>{{trip.start_date}} </td>
+            <td> {{trip.end_date}}</td>
+            <td> {{trip.plan}}</td>
         </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        {% endfor %}
     </table>
-    <!-- <h4>Trip data is: {{testingData}}</h4> -->
+    <h4>Trip info: {{trips}}</h4>
     <div class = links>
         <form action="/logout" method="POST">
             <input type="submit"class="btn btn-success" value="Logout">
             <a href="/main/travels/add">Add Travel Plan</a>
-
 
         </form>
     </div>
