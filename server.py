@@ -99,7 +99,8 @@ def travels():
     query = "SELECT * FROM users_travelplan RIGHT JOIN travel_plan ON travel_plan_id = %(id)s;"
    
     trips = db.query_db(query,data)
-    print(trips)
+    # print(trips)
+    print(users[0])
 
     return render_template("travels.html", userdata=users[0], trips=trips)
 
@@ -196,17 +197,28 @@ def add():
         return redirect("/main/travels/add")
 
 
-@app.route("/main/travels/destination/<id>")
-def destination (id):
+@app.route("/main/travels/destination/<trip_id>")
+def destination (trip_id):
     db = connectToMySQL("vacays")
-    query = "SELECT * FROM travel_plan where id = %(id)s;"
+    query = "SELECT * FROM travel_plan where id = %(trip_id)s;"
+    # query = "SELECT * FROM users join travel_plan where travel_plan_id = %(trip_id)s;"
+    # query = "SELECT * FROM travel_plan join users where id = %(trip_id)s;"
+    # query = "SELECT * FROM travel_plan RIGHT JOIN users on users_id = %(id)s;"
+    # query = "SELECT * FROM users LEFT JOIN travel_plan on travel_plan_id = %(ti)s;"
+    # query = "SELECT * FROM travel_plan join users on user_id = %(id)s;"
+
     data = {
-        "id": session['userdata']
+        # "id": session['userdata'],
+        "trip_id": trip_id,
 
     }
-    trip = db.query_db(query,data)
+    
+    trip= db.query_db(query,data)
+    print("&"*100)
     print(trip)
-    return render_template("destination.html", trip=trip[0])
+    print("&"*100)
+
+    return render_template("destination.html", trip = trip[0])
 
 
 
