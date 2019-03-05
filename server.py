@@ -200,7 +200,14 @@ def add():
 @app.route("/main/travels/destination/<trip_id>")
 def destination (trip_id):
     db = connectToMySQL("vacays")
-    query = "SELECT * FROM travel_plan where id = %(trip_id)s;"
+    query = "select travel_plan.*, users.full_name from travel_plan Join users on travel_plan.users_id = users.id where travel_plan.id=%(trip_id)s;"
+ 
+    # query= "Join users on travel_plan.users_id = users.id and users.id=%(trip_id)s;"
+    # query =  "Join users on travel_plan.users_id = users.id and users.full_name= %(trip_id)s;"
+    # query = "SELECT * FROM travel_plan where id = %(trip_id)s;"
+    # query = "SELECT * FROM travel_plan, users where users_id = %(trip_id)s;"
+    
+    # query = "SELECT travel_plan.*, users.full_name FROM travel_plan, users where travel_plan.users_id = %(trip_id)s;"
     # query = "SELECT * FROM users join travel_plan where travel_plan_id = %(trip_id)s;"
     # query = "SELECT * FROM travel_plan join users where id = %(trip_id)s;"
     # query = "SELECT * FROM travel_plan RIGHT JOIN users on users_id = %(id)s;"
