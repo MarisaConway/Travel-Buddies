@@ -96,13 +96,46 @@ def travels():
     users = db.query_db(query, data)
     
     db = connectToMySQL('vacays')
-    query = "SELECT * FROM users_travelplan RIGHT JOIN travel_plan ON travel_plan_id = %(id)s;"
+    query = "SELECT * FROM users_travelplan RIGHT JOIN travel_plan ON users_travelplan.travel_plan_id = travel_plan.id where users_travelplan.users_id = %(id)s;"
    
     trips = db.query_db(query,data)
-    # print(trips)
-    print(users[0])
 
-    return render_template("travels.html", userdata=users[0], trips=trips)
+    db = connectToMySQL('vacays')
+    query =  "SELECT * FROM users_travelplan RIGHT JOIN travel_plan ON users_travelplan.travel_plan_id = travel_plan.id where users_travelplan.users_id != %(id)s;"
+    # query = "SELECT * travel_plan where users_id != %(id)s;"
+    usertrips = db.query_db(query,data)
+    
+    
+    # print("%"*100)
+    # print(usertrips)
+    # print("&"*100)
+
+    # print(trips)
+    # print(users[0])
+
+    return render_template("travels.html", userdata=users[0], trips=trips, usertrips = usertrips)
+
+
+
+@app.route("/main/travels/join/<trip_id>")
+def join(trip_id):
+    print(trip_id)
+    query = "INSERT INTO users_travelplan (users_id, travel_plan_id, created_at, updated_at) VALUES (%(ui)s, %(ti)s, NOW(), NOW());"
+    data ={
+        "ui": session["userdata"],
+        "ti": trip_id
+        }
+    db = connectToMySQL('vacays')
+    db.query_db(query,data)
+
+    # db = connectToMySQL('vacays')
+    # query = "SELECT * FROM travel_plan;"
+    # usertrips = db.query_db(query,data)
+    # print("%"*100)
+    # print(usertrips)
+    # print("&"*100)
+    return redirect("/travels")
+
 
             
 @app.route("/main/travels/add")
@@ -153,7 +186,7 @@ def add():
         db = connectToMySQL('vacays')
         flash("Successfully added")
         tripdata = db.query_db(query,data)
-        # print(tripdata)
+        print(tripdata)
         # print("*"*20)
         query = "INSERT INTO users_travelplan (users_id, travel_plan_id, created_at, updated_at) VALUES (%(ui)s, %(ti)s, NOW(), NOW());"
         data ={
@@ -216,7 +249,7 @@ def destination (trip_id):
 
     data = {
         # "id": session['userdata'],
-        "trip_id": trip_id,
+        "trip_id": trip_id
 
     }
     
@@ -224,8 +257,25 @@ def destination (trip_id):
     print("&"*100)
     print(trip)
     print("&"*100)
+    
+    db = connectToMySQL("vacays")
+    # query = "select users_travelplan.travel_plan_id, users.full_name from users_travelplan join users on users_travelplan.users_id where users_travelplan.travel_plan_id=%(trip_id)s;"
 
-    return render_template("destination.html", trip = trip[0])
+    query = "select full_name from users_travelplan join users on users.id = users_travelplan.users_id where travel_plan_id = %(trip_id)s;"
+
+    data = {
+    
+        "trip_id": trip_id
+    }
+    
+    trips = db.query_db(query,data)
+
+    print(trips)
+    # query = "select users_travelplan.*, users.full_name from users_travelplan Join users on users_travelplan.users_id = users.id where users_travelplan.id=63;"
+
+    # joinedtrip = db.query_db(query,data)
+    # , joinedtrip = joinedtrip
+    return render_template("destination.html", trip = trip[0], trips = trips)
 
 
 

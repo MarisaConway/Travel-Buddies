@@ -20,7 +20,12 @@
     padding: 10px;
     width:auto;
     }
-
+    td {
+    border: 1px solid #dddddd;
+    /* text-align: left; */
+    padding: 10px;
+    width:auto;
+    }
     .jumbotron{
         background-color: white;
     }
@@ -61,6 +66,26 @@
 
         </form>
     </div>
-        </div>
+    
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Destination</th>
+            <th>Travel Start Date</th>
+            <th>Travel End Date</th>
+            <th>Do You Want To Join?</th>
+        </tr>
+     
+        {%for usertrip in usertrips%}
+       <tr>
+           <td>{{usertrip.id}}</td>
+           <td>{{usertrip.destination}}</td>
+           <td>{{usertrip.start_date}}</td>
+           <td>{{usertrip.end_date}}</td>
+           <td><a href="/main/travels/join/{{usertrip.travel_plan_id}}">Join</a></td>
+       </tr>
+       {%endfor%}
+       
+    </table>
 </body>
 </html>

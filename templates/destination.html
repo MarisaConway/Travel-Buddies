@@ -7,15 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    {% for trip in trips %}
-
-    {%endfor%}
 
     <h1>{{trip.destination}}</h1>
     <h4>Planned By:{{trip.full_name}}</h4>    
     <h4>Description:{{trip.plan}}</h4>
     <h4>Travel Date From: {{trip.start_date}}</h4>
     <h4>Travel Date To:{{trip.end_date}}</h4>
+
+    Other users' joining the trip:
+    {% for trip in trips %}
+        <p>{{trip.full_name}}</p>
+    {% endfor %}
+    
+    
 
 </body>
 </html>
